@@ -29,12 +29,12 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-md bg-black/100 border-b border-white/10">
+    <nav className="w-full fixed top-0 z-50 backdrop-blur-md bg-white/10 border-white/20 shadow-2xl border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
             <Link href="/game/mode" className="text-2xl font-bold text-white">
-              PONG <span className="text-cyan-400">ARENA</span>
+              RETRO <span className="text-cyan-400">CLASH</span>
             </Link>
 
             <div className="hidden md:flex space-x-6">

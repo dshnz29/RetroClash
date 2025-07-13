@@ -1,7 +1,6 @@
 "use client"
 
 import type React from "react"
-
 import { useState } from "react"
 import Link from "next/link"
 import { useRouter } from "next/navigation"
@@ -28,7 +27,6 @@ export default function SignUpPage() {
     setError("")
     setLoading(true)
 
-    // Validation
     if (
       !formData.fullName ||
       !formData.email ||
@@ -53,7 +51,6 @@ export default function SignUpPage() {
       return
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
     if (!emailRegex.test(formData.email)) {
       setError("Please enter a valid email address")
@@ -61,11 +58,8 @@ export default function SignUpPage() {
       return
     }
 
-    // Simulate signup API call
     try {
       await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      // Store user session (in real app, use proper auth)
       localStorage.setItem(
         "user",
         JSON.stringify({
@@ -75,7 +69,7 @@ export default function SignUpPage() {
         }),
       )
       router.push("/game/mode")
-    } catch (err) {
+    } catch {
       setError("Sign up failed. Please try again.")
     } finally {
       setLoading(false)
@@ -83,119 +77,77 @@ export default function SignUpPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900 flex items-center justify-center p-4">
-      <div className="absolute inset-0 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center opacity-10" />
+    <div className="min-h-screen relative flex items-center justify-center bg-black">
+      {/* Background Layer */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/bgimg2.png"
+          alt="Background"
+          className="w-full h-full object-cover opacity-90"
+        />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      </div>
 
-      <Card className="w-full max-w-md backdrop-blur-md bg-white/10 border-white/20 shadow-2xl">
-        <CardHeader className="text-center">
-          <CardTitle className="text-3xl font-bold text-white mb-2">
-            Join <span className="text-cyan-400">PONG ARENA</span>
-          </CardTitle>
-          <CardDescription className="text-gray-300">Create your account to start playing</CardDescription>
-        </CardHeader>
+      {/* Card Content */}
+      <div className="relative z-10 w-full max-w-md px-6 py-12">
+        <Card className="backdrop-blur-md bg-white/10 border border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)]">
+          <CardHeader className="text-center">
+            <CardTitle className="text-4xl font-bold text-white mb-2">
+              Join <span className="text-cyan-400">PONG ARENA</span>
+            </CardTitle>
+            <CardDescription className="text-gray-300 text-lg">
+              Create your account to start playing
+            </CardDescription>
+          </CardHeader>
 
-        <CardContent>
-          <form onSubmit={handleSubmit} className="space-y-4">
-            {error && (
-              <Alert className="bg-red-500/20 border-red-500/50 text-red-200">
-                <AlertDescription>{error}</AlertDescription>
-              </Alert>
-            )}
+          <CardContent>
+            <form onSubmit={handleSubmit} className="space-y-6">
+              {error && (
+                <Alert className="bg-red-500/20 border-red-500/50 text-red-200">
+                  <AlertDescription>{error}</AlertDescription>
+                </Alert>
+              )}
 
-            <div className="space-y-2">
-              <Label htmlFor="fullName" className="text-white">
-                Full Name
-              </Label>
-              <Input
-                id="fullName"
-                type="text"
-                placeholder="Enter your full name"
-                value={formData.fullName}
-                onChange={(e) => setFormData((prev) => ({ ...prev, fullName: e.target.value }))}
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400"
-                required
-              />
+              {[
+                { id: "email", label: "Email", type: "email", placeholder: "Enter your email" },
+                { id: "username", label: "Username", type: "text", placeholder: "Choose a username" },
+                { id: "password", label: "Password", type: "password", placeholder: "Create a password" },
+                { id: "confirmPassword", label: "Confirm Password", type: "password", placeholder: "Confirm your password" },
+              ].map(({ id, label, type, placeholder }) => (
+                <div key={id} className="space-y-2">
+                  <Label htmlFor={id} className="text-white font-semibold">{label}</Label>
+                  <Input
+                    id={id}
+                    type={type}
+                    placeholder={placeholder}
+                    value={(formData as any)[id]}
+                    onChange={(e) => setFormData((prev) => ({ ...prev, [id]: e.target.value }))}
+                    className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400"
+                    required
+                  />
+                </div>
+              ))}
+
+              <Button
+                type="submit"
+                className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-semibold"
+                disabled={loading}
+              >
+                {loading ? "Creating Account..." : "Sign Up"}
+              </Button>
+            </form>
+
+            <div className="mt-6 text-center">
+              <p className="text-gray-300 text-sm">
+                Already have an account?{" "}
+                <Link href="/auth/login" className="text-cyan-400 hover:text-cyan-300 font-semibold">
+                  Sign In
+                </Link>
+              </p>
             </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="email" className="text-white">
-                Email
-              </Label>
-              <Input
-                id="email"
-                type="email"
-                placeholder="Enter your email"
-                value={formData.email}
-                onChange={(e) => setFormData((prev) => ({ ...prev, email: e.target.value }))}
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="username" className="text-white">
-                Username
-              </Label>
-              <Input
-                id="username"
-                type="text"
-                placeholder="Choose a username"
-                value={formData.username}
-                onChange={(e) => setFormData((prev) => ({ ...prev, username: e.target.value }))}
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="password" className="text-white">
-                Password
-              </Label>
-              <Input
-                id="password"
-                type="password"
-                placeholder="Create a password"
-                value={formData.password}
-                onChange={(e) => setFormData((prev) => ({ ...prev, password: e.target.value }))}
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400"
-                required
-              />
-            </div>
-
-            <div className="space-y-2">
-              <Label htmlFor="confirmPassword" className="text-white">
-                Confirm Password
-              </Label>
-              <Input
-                id="confirmPassword"
-                type="password"
-                placeholder="Confirm your password"
-                value={formData.confirmPassword}
-                onChange={(e) => setFormData((prev) => ({ ...prev, confirmPassword: e.target.value }))}
-                className="bg-white/10 border-white/20 text-white placeholder:text-gray-400 focus:border-cyan-400"
-                required
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full bg-cyan-500 hover:bg-cyan-600 text-black font-semibold"
-              disabled={loading}
-            >
-              {loading ? "Creating Account..." : "Sign Up"}
-            </Button>
-          </form>
-
-          <div className="mt-6 text-center">
-            <p className="text-gray-300">
-              Already have an account?{" "}
-              <Link href="/auth/login" className="text-cyan-400 hover:text-cyan-300 font-semibold">
-                Sign In
-              </Link>
-            </p>
-          </div>
-        </CardContent>
-      </Card>
+          </CardContent>
+        </Card>
+      </div>
     </div>
   )
 }

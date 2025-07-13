@@ -39,10 +39,10 @@ export default function LevelSelectionPage() {
       description: "Perfect for beginners",
       details: "Slower ball speed, larger paddles",
       icon: Zap,
-      color: "green",
+      ringColor: "green-400",
       bgColor: "bg-green-500/20",
-      hoverColor: "hover:bg-green-500/30",
-      buttonColor: "bg-green-500 hover:bg-green-600",
+      hoverBg: "hover:bg-green-500/30",
+      button: "bg-green-500 hover:bg-green-600",
     },
     {
       id: "medium",
@@ -50,10 +50,10 @@ export default function LevelSelectionPage() {
       description: "Balanced challenge",
       details: "Normal speed, standard paddles",
       icon: Target,
-      color: "yellow",
+      ringColor: "yellow-400",
       bgColor: "bg-yellow-500/20",
-      hoverColor: "hover:bg-yellow-500/30",
-      buttonColor: "bg-yellow-500 hover:bg-yellow-600",
+      hoverBg: "hover:bg-yellow-500/30",
+      button: "bg-yellow-500 hover:bg-yellow-600",
     },
     {
       id: "hard",
@@ -61,21 +61,30 @@ export default function LevelSelectionPage() {
       description: "For experienced players",
       details: "Fast ball, smaller paddles",
       icon: Flame,
-      color: "red",
+      ringColor: "red-400",
       bgColor: "bg-red-500/20",
-      hoverColor: "hover:bg-red-500/30",
-      buttonColor: "bg-red-500 hover:bg-red-600",
+      hoverBg: "hover:bg-red-500/30",
+      button: "bg-red-500 hover:bg-red-600",
     },
   ]
 
   if (!gameMode) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="absolute inset-0 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center opacity-10" />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/bgimg2.png"
+          alt="Background Mesh"
+          className="w-full h-full object-cover opacity-90"
+        />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      </div>
 
+      {/* Foreground Content */}
       <div className="relative z-10 container mx-auto px-4 py-20">
-        <div className="text-center mb-12">
+        <div className="text-center mb-12 pt-10">
           <h1 className="text-5xl font-bold text-white mb-4">
             Select <span className="text-cyan-400">Difficulty</span>
           </h1>
@@ -90,14 +99,14 @@ export default function LevelSelectionPage() {
             return (
               <Card
                 key={level.id}
-                className={`backdrop-blur-md bg-white/10 border-white/20 shadow-2xl hover:bg-white/15 transition-all duration-300 cursor-pointer group ${level.hoverColor}`}
                 onClick={() => handleLevelSelect(level.id as "easy" | "medium" | "hard")}
+                className={`cursor-pointer group backdrop-blur-md bg-white/10 border border-white/20 hover:bg-white/15 transition-all duration-300`}
               >
                 <CardHeader className="text-center pb-6">
                   <div
-                    className={`mx-auto mb-4 p-4 rounded-full ${level.bgColor} w-20 h-20 flex items-center justify-center group-hover:scale-110 transition-transform`}
+                    className={`mx-auto mb-4 p-4 rounded-full ${level.bgColor} w-20 h-20 flex items-center justify-center group-hover:scale-110 transition-transform ${level.hoverBg}`}
                   >
-                    <IconComponent size={40} className={`text-${level.color}-400`} />
+                    <IconComponent size={40} className={`text-${level.ringColor}`} />
                   </div>
                   <CardTitle className="text-3xl font-bold text-white">{level.name}</CardTitle>
                   <CardDescription className="text-gray-300 text-lg">{level.description}</CardDescription>
@@ -105,7 +114,7 @@ export default function LevelSelectionPage() {
                 <CardContent className="text-center">
                   <p className="text-gray-400 mb-6">{level.details}</p>
                   <Button
-                    className={`w-full ${level.buttonColor} text-white font-semibold text-lg py-6`}
+                    className={`w-full ${level.button} text-white font-semibold text-lg py-6`}
                     onClick={() => handleLevelSelect(level.id as "easy" | "medium" | "hard")}
                   >
                     Play {level.name}

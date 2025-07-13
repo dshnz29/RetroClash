@@ -25,24 +25,36 @@ export default function WinnerPage() {
   const player1Won = gameResult.winner === "Player 1"
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="absolute inset-0 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center opacity-10" />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Layer */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/bgimg2.png"
+          alt="Winner Background"
+          className="w-full h-full object-cover opacity-90"
+        />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      </div>
 
+      {/* Main Content */}
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="text-center mb-12">
           {isDraw ? (
             <>
               <div className="text-8xl mb-6">🤝</div>
               <h1 className="text-6xl font-bold text-white mb-4">
-                It's a <span className="text-yellow-400">Draw!</span>
+                It’s a <span className="text-yellow-400">Draw!</span>
               </h1>
-              <p className="text-xl text-gray-300">Both players played exceptionally well!</p>
+              <p className="text-xl text-gray-300">Both players gave it their all!</p>
             </>
           ) : (
             <>
               <div className="text-8xl mb-6">🏆</div>
               <h1 className="text-6xl font-bold text-white mb-4">
-                <span className={player1Won ? "text-cyan-400" : "text-purple-400"}>{gameResult.winner}</span> Wins!
+                <span className={player1Won ? "text-cyan-400" : "text-purple-400"}>
+                  {gameResult.winner}
+                </span>{" "}
+                Wins!
               </h1>
               <p className="text-xl text-gray-300">Congratulations on your victory!</p>
             </>
@@ -50,7 +62,7 @@ export default function WinnerPage() {
         </div>
 
         {/* Game Summary */}
-        <Card className="backdrop-blur-md bg-white/10 border-white/20 shadow-2xl max-w-2xl mx-auto mb-8">
+        <Card className="backdrop-blur-md bg-white/10 border border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.1)] max-w-2xl mx-auto mb-10">
           <CardHeader className="text-center">
             <CardTitle className="text-3xl text-white flex items-center justify-center">
               <Trophy className="mr-3 text-yellow-400" size={32} />
@@ -60,12 +72,20 @@ export default function WinnerPage() {
           <CardContent>
             <div className="grid grid-cols-2 gap-8 mb-6">
               <div className="text-center">
-                <div className="text-4xl font-bold text-cyan-400 mb-2">{gameResult.player1Score}</div>
-                <div className="text-white">{gameResult.mode === "single" ? "You" : "Player 1"}</div>
+                <div className="text-4xl font-bold text-cyan-400 mb-2">
+                  {gameResult.player1Score}
+                </div>
+                <div className="text-white">
+                  {gameResult.mode === "single" ? "You" : "Player 1"}
+                </div>
               </div>
               <div className="text-center">
-                <div className="text-4xl font-bold text-purple-400 mb-2">{gameResult.player2Score}</div>
-                <div className="text-white">{gameResult.mode === "single" ? "AI" : "Player 2"}</div>
+                <div className="text-4xl font-bold text-purple-400 mb-2">
+                  {gameResult.player2Score}
+                </div>
+                <div className="text-white">
+                  {gameResult.mode === "single" ? "AI" : "Player 2"}
+                </div>
               </div>
             </div>
 

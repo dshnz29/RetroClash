@@ -20,10 +20,8 @@ export default function LeaderboardPage() {
     }
     setUser(JSON.parse(userData))
 
-    // Load game history
     const history = JSON.parse(localStorage.getItem("gameHistory") || "[]")
 
-    // Add some mock data if empty
     if (history.length === 0) {
       const mockGames = [
         {
@@ -51,20 +49,19 @@ export default function LeaderboardPage() {
           timestamp: new Date(Date.now() - 259200000).toISOString(),
         },
       ]
-      setGameHistory([...history, ...mockGames])
+      setGameHistory(mockGames)
     } else {
       setGameHistory(history)
     }
   }, [router])
 
-  const formatDate = (timestamp: string) => {
-    return new Date(timestamp).toLocaleDateString("en-US", {
+  const formatDate = (timestamp: string) =>
+    new Date(timestamp).toLocaleDateString("en-US", {
       month: "short",
       day: "numeric",
       hour: "2-digit",
       minute: "2-digit",
     })
-  }
 
   const getRankIcon = (index: number) => {
     switch (index) {
@@ -75,7 +72,7 @@ export default function LeaderboardPage() {
       case 2:
         return <Award className="text-amber-600" size={20} />
       default:
-        return <span className="text-gray-500 font-bold">{index + 1}</span>
+        return <span className="text-gray-500 font-bold">#{index + 1}</span>
     }
   }
 
@@ -92,7 +89,6 @@ export default function LeaderboardPage() {
     }
   }
 
-  // Sort games by total score (descending)
   const sortedGames = [...gameHistory].sort((a, b) => {
     const totalA = a.player1Score + a.player2Score
     const totalB = b.player1Score + b.player2Score
@@ -102,19 +98,28 @@ export default function LeaderboardPage() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="absolute inset-0 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center opacity-10" />
+    <div className="min-h-screen relative overflow-hidden pt-10">
+      {/* Background Layer */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/bgimg2.png"
+          alt="Leaderboard Background"
+          className="w-full h-full object-cover opacity-90"
+        />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      </div>
 
+      {/* Content */}
       <div className="relative z-10 container mx-auto px-4 py-20">
         <div className="text-center mb-12">
           <h1 className="text-5xl font-bold text-white mb-4">
-            <Trophy className="inline-block mr-4 text-yellow-400" size={48} />
+            <Trophy className="inline-block mr-3 text-yellow-400" size={48} />
             <span className="text-cyan-400">Leaderboard</span>
           </h1>
           <p className="text-xl text-gray-300">Hall of Fame - Top Pong Performances</p>
         </div>
 
-        <Card className="backdrop-blur-md bg-white/10 border-white/20 shadow-2xl max-w-6xl mx-auto">
+        <Card className="backdrop-blur-md bg-white/10 border border-white/20 shadow-[0_0_40px_rgba(255,255,255,0.05)] max-w-6xl mx-auto">
           <CardHeader>
             <CardTitle className="text-2xl text-white text-center">Game History & Rankings</CardTitle>
           </CardHeader>
@@ -141,14 +146,13 @@ export default function LeaderboardPage() {
                   {sortedGames.map((game, index) => (
                     <TableRow key={index} className="border-white/10 hover:bg-white/5">
                       <TableCell className="text-white">
-                        <div className="flex items-center">
+                        <div className="flex items-center space-x-2">
                           {getRankIcon(index)}
-                          <span className="ml-2">#{index + 1}</span>
+                          <span>#{index + 1}</span>
                         </div>
                       </TableCell>
                       <TableCell className="text-white font-mono">
-                        <span className="text-cyan-400">{game.player1Score}</span>
-                        {" - "}
+                        <span className="text-cyan-400">{game.player1Score}</span> -{" "}
                         <span className="text-purple-400">{game.player2Score}</span>
                       </TableCell>
                       <TableCell className="text-white">

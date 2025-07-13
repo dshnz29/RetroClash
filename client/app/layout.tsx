@@ -1,4 +1,3 @@
-import type React from "react"
 import type { Metadata } from "next"
 import { Inter } from "next/font/google"
 import "./globals.css"
@@ -7,9 +6,9 @@ import Navbar from "@/components/navbar"
 const inter = Inter({ subsets: ["latin"] })
 
 export const metadata: Metadata = {
-  title: "Pong Arena - Gaming Website",
-  description: "A responsive gaming website for physical Pong game",
-    generator: 'v0.dev'
+  title: "RETRO CLASH",
+  description: "A gaming website for physical Pong game",
+  generator: "",
 }
 
 export default function RootLayout({

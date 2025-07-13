@@ -27,11 +27,20 @@ export default function ModeSelectionPage() {
   if (!user) return null
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-900 via-purple-900 to-slate-900">
-      <div className="absolute inset-0 bg-[url('/placeholder.svg?height=1080&width=1920')] bg-cover bg-center opacity-10" />
+    <div className="min-h-screen relative overflow-hidden">
+      {/* Background Gradient Image */}
+      <div className="absolute inset-0 z-0">
+        <img
+          src="/bgimg2.png"
+          alt="Background Mesh"
+          className="w-full h-full object-cover opacity-90"
+        />
+        <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      </div>
 
-      <div className="relative z-10 container mx-auto px-4 py-20">
-        <div className="text-center mb-12">
+      {/* Main Content */}
+      <div className="relative z-10 container mx-auto px-4 pt-20">
+        <div className="text-center mb-12 pt-10">
           <h1 className="text-5xl font-bold text-white mb-4">
             Choose Your <span className="text-cyan-400">Mode</span>
           </h1>
@@ -40,7 +49,7 @@ export default function ModeSelectionPage() {
 
         <div className="grid md:grid-cols-2 gap-8 max-w-4xl mx-auto">
           <Card
-            className="backdrop-blur-md bg-white/10 border-white/20 shadow-2xl hover:bg-white/15 transition-all duration-300 cursor-pointer group"
+            className="backdrop-blur-md bg-white/10 border border-cyan-400/20 shadow-[0_0_40px_#0ff2] hover:bg-white/15 transition-all duration-300 cursor-pointer group"
             onClick={() => handleModeSelect("single")}
           >
             <CardHeader className="text-center pb-6">
@@ -64,7 +73,7 @@ export default function ModeSelectionPage() {
           </Card>
 
           <Card
-            className="backdrop-blur-md bg-white/10 border-white/20 shadow-2xl hover:bg-white/15 transition-all duration-300 cursor-pointer group"
+            className="backdrop-blur-md bg-white/10 border border-purple-400/20  hover:bg-white/15 transition-all duration-300 cursor-pointer group"
             onClick={() => handleModeSelect("dual")}
           >
             <CardHeader className="text-center pb-6">
