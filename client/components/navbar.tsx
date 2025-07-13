@@ -29,7 +29,7 @@ export default function Navbar() {
   }
 
   return (
-    <nav className="sticky top-0 z-50 backdrop-blur-md bg-black/20 border-b border-white/10">
+    <nav className="sticky top-0 z-50 backdrop-blur-md bg-black/100 border-b border-white/10">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between items-center h-16">
           <div className="flex items-center space-x-8">
@@ -65,7 +65,7 @@ export default function Navbar() {
               onClick={handleSignOut}
               variant="outline"
               size="sm"
-              className="bg-white/10 border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/50"
+              className="bg-white/10 border-white/20 text-white hover:bg-red-500/20 hover:border-red-500/50 hover:text-white"
             >
               <LogOut size={16} className="mr-2" />
               Sign Out
