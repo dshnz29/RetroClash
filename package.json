@@ -1,0 +1,21 @@
+{
+  "name": "firebase-realtime-db-test",
+  "version": "1.0.0",
+  "description": "Simple Node.js app to test Firebase Realtime Database",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js",
+    "test": "node index.js"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.0.0"
+  },
+  "keywords": [
+    "firebase",
+    "realtime-database",
+    "nodejs",
+    "test"
+  ],
+  "author": "Your Name",
+  "license": "MIT"
+}
