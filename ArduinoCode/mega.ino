@@ -6,23 +6,9 @@
 #define stepPinB 24
 #define dirPinB 25
 
-// --- Paddle motor pins ---
-#define stepPinPaddle1 26
-#define dirPinPaddle1 27
-#define stepPinPaddle2 22
-#define dirPinPaddle2 23
-
-// --- Paddle encoder pins ---
-#define enc1PinA 2
-#define enc1PinB 3
-#define enc2PinA 18
-#define enc2PinB 19
-
 // --- Motors ---
 AccelStepper motorA(AccelStepper::DRIVER, stepPinA, dirPinA);
 AccelStepper motorB(AccelStepper::DRIVER, stepPinB, dirPinB);
-AccelStepper paddleMotor1(AccelStepper::DRIVER, stepPinPaddle1, dirPinPaddle1);
-AccelStepper paddleMotor2(AccelStepper::DRIVER, stepPinPaddle2, dirPinPaddle2);
 
 // --- Constants ---
 const int widthMM = 34;
@@ -32,33 +18,18 @@ const int stepsPerMM = 80;
 const int maxXSteps = widthMM * stepsPerMM;
 const int maxYSteps = heightMM * stepsPerMM;
 
-const int paddleWidthMM = 6;
-const int paddleWidthSteps = paddleWidthMM * stepsPerMM;
-
 // --- Motion config ---
 int xSpeed = 550;
 int ySpeed = 550;
 
 // --- Ball state ---
-long xSteps = 0;
-long ySteps = 0;
+long xSteps = 17 * stepsPerMM;  // Ball starts at x=17mm
+long ySteps = 9.5 * stepsPerMM; // Ball starts at y=9.5mm
 bool xDir = true;
 bool yDir = true;
 
-// --- Paddle state ---
-volatile long encoderDelta1 = 0;
-volatile long encoderDelta2 = 0;
-long paddleXSteps1 = maxXSteps / 2;
-long paddleXSteps2 = maxXSteps / 2;
-long lastPaddleTarget1 = paddleXSteps1;
-long lastPaddleTarget2 = paddleXSteps2;
-
-// --- Score state ---
-int player1Score = 0;
-int player2Score = 0;
-
 void setup() {
-  Serial.begin(115200);  // USB serial monitor
+  Serial.begin(115200);
   Serial2.begin(9600);   // ESP32 communication (TX2=16, RX2=17)
 
   motorA.setMaxSpeed(5000);
@@ -66,50 +37,37 @@ void setup() {
   motorA.setAcceleration(0);
   motorB.setAcceleration(0);
 
-  paddleMotor1.setMaxSpeed(1500);
-  paddleMotor1.setAcceleration(1000);
-  paddleMotor1.setCurrentPosition(paddleXSteps1);
-
-  paddleMotor2.setMaxSpeed(1500);
-  paddleMotor2.setAcceleration(1000);
-  paddleMotor2.setCurrentPosition(paddleXSteps2);
-
-  float centerXmm = widthMM / 2.0;
-  float centerYmm = heightMM / 2.0;
-  long startA = (centerXmm + centerYmm) * stepsPerMM;
-  long startB = (centerXmm - centerYmm) * stepsPerMM;
-  motorA.setCurrentPosition(startA);
-  motorB.setCurrentPosition(startB);
-
-  pinMode(enc1PinA, INPUT_PULLUP);
-  pinMode(enc1PinB, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(enc1PinA), handleEnc1A, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(enc1PinB), handleEnc1B, CHANGE);
-
-  pinMode(enc2PinA, INPUT_PULLUP);
-  pinMode(enc2PinB, INPUT_PULLUP);
-  attachInterrupt(digitalPinToInterrupt(enc2PinA), handleEnc2A, CHANGE);
-  attachInterrupt(digitalPinToInterrupt(enc2PinB), handleEnc2B, CHANGE);
+  // Set ball starting position to x=17mm, y=9.5mm
+  // For CoreXY: motorA = x + y, motorB = x - y
+  float startX = 17.0; // mm
+  float startY = 9.5;  // mm
+  
+  long startXSteps = startX * stepsPerMM;
+  long startYSteps = startY * stepsPerMM;
+  
+  long motorAStart = startXSteps + startYSteps;
+  long motorBStart = startXSteps - startYSteps;
+  
+  motorA.setCurrentPosition(motorAStart);
+  motorB.setCurrentPosition(motorBStart);
+  
+  Serial.println("Ball starting at position (17mm, 9.5mm)");
+  
+  // Move ball to center (0, 0) after startup
+  delay(1000); // Wait 1 second
+  moveBallToPosition(0, 0);
+  Serial.println("Ball moved to center (0mm, 0mm)");
 }
 
 void loop() {
-  static unsigned long lastPaddleUpdate = 0;
   if (Serial2.available()) {
     String msg = Serial2.readStringUntil('\n');
     Serial.print("From ESP32: ");
     Serial.println(msg);
   }
 
-  if (millis() - lastPaddleUpdate >= 20) {
-    lastPaddleUpdate = millis();
-    updatePaddle1();
-    updatePaddle2();
-  }
-
   updateBallPosition();
   runCoreXY();
-  paddleMotor1.run();
-  paddleMotor2.run();
 }
 
 void runCoreXY() {
@@ -126,109 +84,91 @@ void runCoreXY() {
   motorB.runSpeed();
 }
 
-void updatePaddle1() {
-  noInterrupts();
-  long delta = encoderDelta1;
-  encoderDelta1 = 0;
-  interrupts();
-
-  if (delta != 0) {
-    paddleXSteps1 += delta;
-    paddleXSteps1 = constrain(paddleXSteps1, 0, maxXSteps);
-    if (paddleXSteps1 != lastPaddleTarget1) {
-      paddleMotor1.moveTo(paddleXSteps1);
-      lastPaddleTarget1 = paddleXSteps1;
-    }
-  }
-}
-
-void updatePaddle2() {
-  noInterrupts();
-  long delta = encoderDelta2;
-  encoderDelta2 = 0;
-  interrupts();
-
-  if (delta != 0) {
-    paddleXSteps2 += delta;
-    paddleXSteps2 = constrain(paddleXSteps2, 0, maxXSteps);
-    if (paddleXSteps2 != lastPaddleTarget2) {
-      paddleMotor2.moveTo(paddleXSteps2);
-      lastPaddleTarget2 = paddleXSteps2;
-    }
-  }
-}
-
 void updateBallPosition() {
+  // Update ball position from motor positions
   xSteps = (motorA.currentPosition() + motorB.currentPosition()) / 2;
   ySteps = (motorA.currentPosition() - motorB.currentPosition()) / 2;
 
-  if (xSteps >= maxXSteps) xDir = false;
-  if (xSteps <= 0) xDir = true;
+  // Convert to coordinate system where boundaries are at 0 to maxXSteps and 0 to maxYSteps
+  long minXSteps = 0;
+  long maxXStepsLimit = maxXSteps;
+  long minYSteps = 0;
+  long maxYStepsLimit = maxYSteps;
 
-  // Top paddle (Player 2)
-  if (ySteps >= maxYSteps) {
-    float ballXmm = xSteps / (float)stepsPerMM;
-    float paddleXmm = paddleXSteps2 / (float)stepsPerMM;
-    float paddleLeft = paddleXmm - (paddleWidthMM / 2.0);
-    float paddleRight = paddleXmm + (paddleWidthMM / 2.0);
-
-    if (ballXmm >= paddleLeft && ballXmm <= paddleRight) {
-      Serial.println("🎯 HIT (Top)");
-      player2Score++;
-      sendScoreToESP();
-      yDir = false;
-    } else {
-      Serial.println("❌ MISS (Top)");
-      yDir = false;
-    }
+  // Bounce off walls
+  if (xSteps >= maxXStepsLimit) {
+    xDir = false;
+    Serial.println("Ball hit right wall");
+  }
+  if (xSteps <= minXSteps) {
+    xDir = true;
+    Serial.println("Ball hit left wall");
+  }
+  
+  if (ySteps >= maxYStepsLimit) {
+    yDir = false;
+    Serial.println("Ball hit top wall");
+  }
+  if (ySteps <= minYSteps) {
+    yDir = true;
+    Serial.println("Ball hit bottom wall");
   }
 
-  // Bottom paddle (Player 1)
-  if (ySteps <= 0) {
-    float ballXmm = xSteps / (float)stepsPerMM;
-    float paddleXmm = paddleXSteps1 / (float)stepsPerMM;
-    float paddleLeft = paddleXmm - (paddleWidthMM / 2.0);
-    float paddleRight = paddleXmm + (paddleWidthMM / 2.0);
-
-    if (ballXmm >= paddleLeft && ballXmm <= paddleRight) {
-      Serial.println("🎯 HIT (Bottom)");
-      player1Score++;
-      sendScoreToESP();
-      yDir = true;
-    } else {
-      Serial.println("❌ MISS (Bottom)");
-      yDir = true;
-    }
+  // Debug output every 1000ms
+  static unsigned long lastDebug = 0;
+  if (millis() - lastDebug >= 1000) {
+    lastDebug = millis();
+    Serial.print("Ball position - X: ");
+    Serial.print(xSteps);
+    Serial.print(" steps (");
+    Serial.print(xSteps / (float)stepsPerMM);
+    Serial.print("mm), Y: ");
+    Serial.print(ySteps);
+    Serial.print(" steps (");
+    Serial.print(ySteps / (float)stepsPerMM);
+    Serial.println("mm)");
   }
 }
 
-// --- Send Score to ESP32 ---
-void sendScoreToESP() {
-  String scoreJSON = "{\"player1\":" + String(player1Score) + ",\"player2\":" + String(player2Score) + "}";
-  Serial2.println(scoreJSON);
-}
-
-// --- Encoder ISR handlers ---
-void handleEnc1A() {
-  bool A = digitalRead(enc1PinA);
-  bool B = digitalRead(enc1PinB);
-  encoderDelta1 += (A == B) ? 1 : -1;
-}
-
-void handleEnc1B() {
-  bool A = digitalRead(enc1PinA);
-  bool B = digitalRead(enc1PinB);
-  encoderDelta1 += (A != B) ? 1 : -1;
-}
-
-void handleEnc2A() {
-  bool A = digitalRead(enc2PinA);
-  bool B = digitalRead(enc2PinB);
-  encoderDelta2 += (A == B) ? 1 : -1;
-}
-
-void handleEnc2B() {
-  bool A = digitalRead(enc2PinA);
-  bool B = digitalRead(enc2PinB);
-  encoderDelta2 += (A != B) ? 1 : -1;
+// Function to move ball to a specific position
+void moveBallToPosition(float targetXmm, float targetYmm) {
+  Serial.print("Moving ball to position (");
+  Serial.print(targetXmm);
+  Serial.print("mm, ");
+  Serial.print(targetYmm);
+  Serial.println("mm)");
+  
+  // Calculate target motor positions
+  long targetXSteps = targetXmm * stepsPerMM;
+  long targetYSteps = targetYmm * stepsPerMM;
+  
+  long motorATarget = targetXSteps + targetYSteps;
+  long motorBTarget = targetXSteps - targetYSteps;
+  
+  // Set motors to move to target positions
+  motorA.setMaxSpeed(2000); // Slower speed for positioning
+  motorB.setMaxSpeed(2000);
+  motorA.setAcceleration(1000);
+  motorB.setAcceleration(1000);
+  
+  motorA.moveTo(motorATarget);
+  motorB.moveTo(motorBTarget);
+  
+  // Wait for movement to complete
+  while (motorA.isRunning() || motorB.isRunning()) {
+    motorA.run();
+    motorB.run();
+  }
+  
+  // Update ball position variables
+  xSteps = targetXSteps;
+  ySteps = targetYSteps;
+  
+  // Reset motor settings for normal operation
+  motorA.setMaxSpeed(5000);
+  motorB.setMaxSpeed(5000);
+  motorA.setAcceleration(0);
+  motorB.setAcceleration(0);
+  
+  Serial.println("Ball positioning complete");
 }
