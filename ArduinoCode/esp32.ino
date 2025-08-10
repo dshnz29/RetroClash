@@ -1,15 +1,28 @@
-#include <WiFi.h>
+
+#include <Arduino.h>
+#if defined(ESP32)
+  #include <WiFi.h>
+#elif defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#endif
 #include <Firebase_ESP_Client.h>
 
+// Provide the token generation process info.
+#include "addons/TokenHelper.h"
+// Provide the RTDB payload printing info and other helper functions.
+#include "addons/RTDBHelper.h"
 
+// Insert your network credentials
 #define WIFI_SSID "Dialog 4G"
 #define WIFI_PASSWORD "YGLG51T8TD0"
 
+// Insert Firebase project API Key
+#define API_KEY "AIzaSyB7qBosrYxSVwmEPXw7o-f_uQc8wXtErK8"
 
-#define FIREBASE_HOST "https://retroclash-f7bf0-default-rtdb.firebaseio.com/"
-#define FIREBASE_AUTH "AIzaSyB7qBosrYxSVwmEPXw7o-f_uQc8wXtErK8"
+// Insert Firebase RTDB URL
+#define DATABASE_URL "https://retroclash-f7bf0-default-rtdb.firebaseio.com/"
 
-
+// Define Firebase Data object
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
@@ -17,17 +30,6 @@ FirebaseConfig config;
 unsigned long sendDataPrevMillis = 0;
 int count = 0;
 bool signupOK = false;
-
-// Simple token status logging (replaces TokenHelper.h)
-void tokenStatusCallback(FirebaseAuth *auth, FirebaseConfig *config) {
-  Serial.println("Token event occurred.");
-  Serial.print("Auth token: ");
-  if (auth->token.uid != "") {
-    Serial.println(auth->token.uid.c_str());
-  } else {
-    Serial.println("(empty)");
-  }
-}
 
 void setup() {
   Serial.begin(115200);
@@ -48,14 +50,13 @@ void setup() {
 
   // Sign up anonymously
   if (Firebase.signUp(&config, &auth, "", "")) {
-    Serial.println("Firebase signup successful");
+    Serial.println("ok");
     signupOK = true;
   } else {
-    Serial.print("Signup failed: ");
-    Serial.println(config.signer.signupError.message.c_str());
+    Serial.printf("%s\n", config.signer.signupError.message.c_str());
   }
 
-  // Set token status callback
+  // Assign the callback function for token generation
   config.token_status_callback = tokenStatusCallback;
 
   // Start Firebase
@@ -70,18 +71,23 @@ void loop() {
 
     // Write an integer
     if (Firebase.RTDB.setInt(&fbdo, "test/int", count)) {
-      Serial.println("Wrote int successfully: " + String(count));
+      Serial.println("PASSED");
+      Serial.println("PATH: " + fbdo.dataPath());
+      Serial.println("TYPE: " + fbdo.dataType());
     } else {
-      Serial.println("Failed to write int: " + fbdo.errorReason());
+      Serial.println("FAILED");
+      Serial.println("REASON: " + fbdo.errorReason());
     }
     count++;
 
     // Write a float
-    float randomFloat = 0.01 + random(0, 100);
-    if (Firebase.RTDB.setFloat(&fbdo, "test/float", randomFloat)) {
-      Serial.println("Wrote float successfully: " + String(randomFloat));
+    if (Firebase.RTDB.setFloat(&fbdo, "test/float", 0.01 + random(0, 100))) {
+      Serial.println("PASSED");
+      Serial.println("PATH: " + fbdo.dataPath());
+      Serial.println("TYPE: " + fbdo.dataType());
     } else {
-      Serial.println("Failed to write float: " + fbdo.errorReason());
+      Serial.println("FAILED");
+      Serial.println("REASON: " + fbdo.errorReason());
     }
   }
 }
