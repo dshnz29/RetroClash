@@ -1,5 +1,5 @@
 #include <WiFi.h>
-#include <FirebaseESP32.h>
+#include <Firebase_ESP_Client.h>
 
 
 #define WIFI_SSID "Dialog 4G"
