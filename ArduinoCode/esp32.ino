@@ -1,52 +1,93 @@
-#include <WiFi.h>
+
+#include <Arduino.h>
+#if defined(ESP32)
+  #include <WiFi.h>
+#elif defined(ESP8266)
+  #include <ESP8266WiFi.h>
+#endif
 #include <Firebase_ESP_Client.h>
 
-// Replace with your network credentials
-#define WIFI_SSID "Dialog 4G 128"
-#define WIFI_PASSWORD "8A1c939D"
+// Provide the token generation process info.
+#include "addons/TokenHelper.h"
+// Provide the RTDB payload printing info and other helper functions.
+#include "addons/RTDBHelper.h"
 
-// Firebase settings
-#define DATABASE_URL "https://test-dfc0e-default-rtdb.firebaseio.com/"
-#define DATABASE_SECRET "QLiepUBYqpaqnejFuZjGFiAI1fa8RFgv9gXCTG1h"  // Legacy Token
+// Insert your network credentials
+#define WIFI_SSID "Dialog 4G"
+#define WIFI_PASSWORD "YGLG51T8TD0"
 
+// Insert Firebase project API Key
+#define API_KEY "AIzaSyB7qBosrYxSVwmEPXw7o-f_uQc8wXtErK8"
+
+// Insert Firebase RTDB URL
+#define DATABASE_URL "https://retroclash-f7bf0-default-rtdb.firebaseio.com/"
+
+// Define Firebase Data object
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
 
-unsigned long lastSendTime = 0;
+unsigned long sendDataPrevMillis = 0;
+int count = 0;
+bool signupOK = false;
 
 void setup() {
   Serial.begin(115200);
 
   WiFi.begin(WIFI_SSID, WIFI_PASSWORD);
-  Serial.print("Connecting to WiFi");
+  Serial.print("Connecting to Wi-Fi");
   while (WiFi.status() != WL_CONNECTED) {
-    delay(500);
     Serial.print(".");
+    delay(300);
   }
-  Serial.println("\nConnected to WiFi!");
+  Serial.println();
+  Serial.print("Connected with IP: ");
+  Serial.println(WiFi.localIP());
 
-  // Set Firebase credentials
+  // Assign the API key and database URL
+  config.api_key = API_KEY;
   config.database_url = DATABASE_URL;
-  config.signer.tokens.legacy_token = DATABASE_SECRET;
 
+  // Sign up anonymously
+  if (Firebase.signUp(&config, &auth, "", "")) {
+    Serial.println("ok");
+    signupOK = true;
+  } else {
+    Serial.printf("%s\n", config.signer.signupError.message.c_str());
+  }
+
+  // Assign the callback function for token generation
+  config.token_status_callback = tokenStatusCallback;
+
+  // Start Firebase
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
 }
 
 void loop() {
-  if (millis() - lastSendTime > 1000) {
-    int randNum = random(0, 100);
-    Serial.print("Sending random number: ");
-    Serial.println(randNum);
+  if (Firebase.ready() && signupOK &&
+      (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0)) {
+    sendDataPrevMillis = millis();
 
-    if (Firebase.RTDB.setInt(&fbdo, "/esp32/random", randNum)) {
-      Serial.println("Sent successfully.");
+    // Write an integer
+    if (Firebase.RTDB.setInt(&fbdo, "test/int", count)) {
+      Serial.println("PASSED");
+      Serial.println("PATH: " + fbdo.dataPath());
+      Serial.println("TYPE: " + fbdo.dataType());
     } else {
-      Serial.print("Firebase Error: ");
-      Serial.println(fbdo.errorReason());
+      Serial.println("FAILED");
+      Serial.println("REASON: " + fbdo.errorReason());
     }
+    count++;
 
-    lastSendTime = millis();
+    // Write a float
+    if (Firebase.RTDB.setFloat(&fbdo, "test/float", 0.01 + random(0, 100))) {
+      Serial.println("PASSED");
+      Serial.println("PATH: " + fbdo.dataPath());
+      Serial.println("TYPE: " + fbdo.dataType());
+    } else {
+      Serial.println("FAILED");
+      Serial.println("REASON: " + fbdo.errorReason());
+    }
   }
 }
