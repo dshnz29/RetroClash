@@ -1,4 +1,3 @@
-
 #include <Arduino.h>
 #if defined(ESP32)
   #include <WiFi.h>
@@ -6,30 +5,36 @@
   #include <ESP8266WiFi.h>
 #endif
 #include <Firebase_ESP_Client.h>
-
-// Provide the token generation process info.
 #include "addons/TokenHelper.h"
-// Provide the RTDB payload printing info and other helper functions.
 #include "addons/RTDBHelper.h"
 
-// Insert your network credentials
+// Wi-Fi credentials
 #define WIFI_SSID "Dialog 4G"
 #define WIFI_PASSWORD "YGLG51T8TD0"
 
-// Insert Firebase project API Key
+// Firebase credentials
 #define API_KEY "AIzaSyB7qBosrYxSVwmEPXw7o-f_uQc8wXtErK8"
-
-// Insert Firebase RTDB URL
 #define DATABASE_URL "https://retroclash-f7bf0-default-rtdb.firebaseio.com/"
 
-// Define Firebase Data object
 FirebaseData fbdo;
 FirebaseAuth auth;
 FirebaseConfig config;
 
-unsigned long sendDataPrevMillis = 0;
-int count = 0;
 bool signupOK = false;
+unsigned long lastUpdate = 0;
+const int updateInterval = 1000; // 1 second
+
+// Match ID
+String matchId = "match123";
+
+// Game data
+int player1Score = 10;
+int player2Score = 15;
+String player1Name = "xyz";
+String player2Name = "abc";
+String gameMode = "medium";
+bool mirrorMode = true;
+bool isPlaying = false;
 
 void setup() {
   Serial.begin(115200);
@@ -40,54 +45,48 @@ void setup() {
     Serial.print(".");
     delay(300);
   }
-  Serial.println();
-  Serial.print("Connected with IP: ");
-  Serial.println(WiFi.localIP());
+  Serial.println("\nConnected with IP: " + WiFi.localIP().toString());
 
-  // Assign the API key and database URL
   config.api_key = API_KEY;
   config.database_url = DATABASE_URL;
 
-  // Sign up anonymously
   if (Firebase.signUp(&config, &auth, "", "")) {
-    Serial.println("ok");
+    Serial.println("Firebase signup OK");
     signupOK = true;
   } else {
-    Serial.printf("%s\n", config.signer.signupError.message.c_str());
+    Serial.printf("Signup error: %s\n", config.signer.signupError.message.c_str());
   }
 
-  // Assign the callback function for token generation
   config.token_status_callback = tokenStatusCallback;
-
-  // Start Firebase
   Firebase.begin(&config, &auth);
   Firebase.reconnectWiFi(true);
 }
 
 void loop() {
-  if (Firebase.ready() && signupOK &&
-      (millis() - sendDataPrevMillis > 15000 || sendDataPrevMillis == 0)) {
-    sendDataPrevMillis = millis();
+  if (Firebase.ready() && signupOK && (millis() - lastUpdate > updateInterval)) {
+    lastUpdate = millis();
 
-    // Write an integer
-    if (Firebase.RTDB.setInt(&fbdo, "test/int", count)) {
-      Serial.println("PASSED");
-      Serial.println("PATH: " + fbdo.dataPath());
-      Serial.println("TYPE: " + fbdo.dataType());
-    } else {
-      Serial.println("FAILED");
-      Serial.println("REASON: " + fbdo.errorReason());
-    }
-    count++;
+    // Increment scores randomly (0, 1, or 2)
+    player1Score += random(0, 3);
+    player2Score += random(0, 3);
 
-    // Write a float
-    if (Firebase.RTDB.setFloat(&fbdo, "test/float", 0.01 + random(0, 100))) {
-      Serial.println("PASSED");
-      Serial.println("PATH: " + fbdo.dataPath());
-      Serial.println("TYPE: " + fbdo.dataType());
+    // Create JSON object
+    FirebaseJson gameData;
+    gameData.set("player1/name", player1Name);
+    gameData.set("player1/score", player1Score);
+    gameData.set("player2/name", player2Name);
+    gameData.set("player2/score", player2Score);
+    gameData.set("gameMode", gameMode);
+    gameData.set("mirrorMode", mirrorMode);
+    gameData.set("isPlaying", isPlaying);
+
+    String path = "/matches/" + matchId;
+
+    if (Firebase.RTDB.updateNode(&fbdo, path.c_str(), &gameData)) {
+      Serial.println("Match updated successfully:");
+      Serial.println(gameData.raw());
     } else {
-      Serial.println("FAILED");
-      Serial.println("REASON: " + fbdo.errorReason());
+      Serial.println("Update failed: " + fbdo.errorReason());
     }
   }
 }
