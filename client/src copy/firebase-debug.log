@@ -1,0 +1,87 @@
+[debug] [2025-08-09T21:26:47.576Z] ----------------------------------------------------------------------
+[debug] [2025-08-09T21:26:47.581Z] Command:       /Users/inukagunathilake/.nvm/versions/node/v23.3.0/bin/node /Users/inukagunathilake/.nvm/versions/node/v23.3.0/bin/firebase init
+[debug] [2025-08-09T21:26:47.581Z] CLI Version:   14.12.0
+[debug] [2025-08-09T21:26:47.581Z] Platform:      darwin
+[debug] [2025-08-09T21:26:47.581Z] Node Version:  v23.3.0
+[debug] [2025-08-09T21:26:47.581Z] Time:          Sun Aug 10 2025 02:56:47 GMT+0530 (India Standard Time)
+[debug] [2025-08-09T21:26:47.581Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-09T21:26:47.585Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-09T21:26:47.585Z] > authorizing via signed-in user (ingunathilake100@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/inukagunathilake/Myprojects/Hardware project L1/L1-Hardware-project-client/src
+
+[info] 
+=== Project Setup
+[info] 
+[info] First, let's associate this project directory with a Firebase project.
+[info] You can create multiple project aliases by running firebase use --add, 
+[info] but for now we'll just set up a default project.
+[info] 
+[debug] [2025-08-09T21:26:52.854Z] Checked if tokens are valid: false, expires at: 1705089162306
+[debug] [2025-08-09T21:26:52.855Z] Checked if tokens are valid: false, expires at: 1705089162306
+[debug] [2025-08-09T21:26:52.855Z] > refreshing access token with scopes: []
+[debug] [2025-08-09T21:26:52.859Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-08-09T21:26:52.859Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-09T21:26:53.673Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-08-09T21:26:53.673Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-09T21:26:53.674Z] >>> [apiv2][query] GET https://firebase.googleapis.com/v1beta1/projects pageSize=100
+[debug] [2025-08-09T21:26:56.138Z] <<< [apiv2][status] GET https://firebase.googleapis.com/v1beta1/projects 401
+[debug] [2025-08-09T21:26:56.138Z] <<< [apiv2][body] GET https://firebase.googleapis.com/v1beta1/projects [omitted]
+[debug] [2025-08-09T21:26:56.138Z] Got a 401 Unauthenticated error for a call that required authentication. Refreshing tokens.
+[debug] [2025-08-09T21:26:56.138Z] Checked if tokens are valid: false, expires at: 1705089162306
+[debug] [2025-08-09T21:26:56.138Z] Checked if tokens are valid: false, expires at: 1705089162306
+[debug] [2025-08-09T21:26:56.138Z] > refreshing access token with scopes: []
+[debug] [2025-08-09T21:26:56.139Z] >>> [apiv2][query] POST https://www.googleapis.com/oauth2/v3/token [none]
+[debug] [2025-08-09T21:26:56.140Z] >>> [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-09T21:26:56.545Z] <<< [apiv2][status] POST https://www.googleapis.com/oauth2/v3/token 400
+[debug] [2025-08-09T21:26:56.545Z] <<< [apiv2][body] POST https://www.googleapis.com/oauth2/v3/token [omitted]
+[debug] [2025-08-09T21:26:56.548Z] Request to https://firebase.googleapis.com/v1beta1/projects?pageSize=100 had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+[debug] [2025-08-09T21:26:56.551Z] FirebaseError: Request to https://firebase.googleapis.com/v1beta1/projects?pageSize=100 had HTTP Error: 401, Request had invalid authentication credentials. Expected OAuth 2 access token, login cookie or other valid authentication credential. See https://developers.google.com/identity/sign-in/web/devconsole-project.
+    at responseToError (/Users/inukagunathilake/.nvm/versions/node/v23.3.0/lib/node_modules/firebase-tools/lib/responseToError.js:52:12)
+    at RetryOperation._fn (/Users/inukagunathilake/.nvm/versions/node/v23.3.0/lib/node_modules/firebase-tools/lib/apiv2.js:312:77)
+    at process.processTicksAndRejections (node:internal/process/task_queues:105:5)
+[error] 
+[error] Error: Failed to list Firebase projects. See firebase-debug.log for more info.
+[debug] [2025-08-09T21:27:33.482Z] ----------------------------------------------------------------------
+[debug] [2025-08-09T21:27:33.487Z] Command:       /Users/inukagunathilake/.nvm/versions/node/v23.3.0/bin/node /Users/inukagunathilake/.nvm/versions/node/v23.3.0/bin/firebase init
+[debug] [2025-08-09T21:27:33.487Z] CLI Version:   14.12.0
+[debug] [2025-08-09T21:27:33.487Z] Platform:      darwin
+[debug] [2025-08-09T21:27:33.487Z] Node Version:  v23.3.0
+[debug] [2025-08-09T21:27:33.487Z] Time:          Sun Aug 10 2025 02:57:33 GMT+0530 (India Standard Time)
+[debug] [2025-08-09T21:27:33.487Z] ----------------------------------------------------------------------
+[debug] 
+[debug] [2025-08-09T21:27:33.492Z] > command requires scopes: ["email","openid","https://www.googleapis.com/auth/cloudplatformprojects.readonly","https://www.googleapis.com/auth/firebase","https://www.googleapis.com/auth/cloud-platform"]
+[debug] [2025-08-09T21:27:33.492Z] > authorizing via signed-in user (ingunathilake100@gmail.com)
+[info] 
+     ######## #### ########  ######## ########     ###     ######  ########
+     ##        ##  ##     ## ##       ##     ##  ##   ##  ##       ##
+     ######    ##  ########  ######   ########  #########  ######  ######
+     ##        ##  ##    ##  ##       ##     ## ##     ##       ## ##
+     ##       #### ##     ## ######## ########  ##     ##  ######  ########
+
+You're about to initialize a Firebase project in this directory:
+
+  /Users/inukagunathilake/Myprojects/Hardware project L1/L1-Hardware-project-client/src
+
+[debug] [2025-08-09T21:28:00.940Z] ExitPromptError: User force closed the prompt with SIGINT
+    at Interface.sigint (/Users/inukagunathilake/.nvm/versions/node/v23.3.0/lib/node_modules/firebase-tools/node_modules/@inquirer/core/dist/commonjs/lib/create-prompt.js:101:37)
+    at Interface.emit (node:events:513:28)
+    at Interface.emit (node:domain:489:12)
+    at [_ttyWrite] [as _ttyWrite] (node:internal/readline/interface:1125:18)
+    at ReadStream.onkeypress (node:internal/readline/interface:264:20)
+    at ReadStream.emit (node:events:525:35)
+    at ReadStream.emit (node:domain:489:12)
+    at emitKeys (node:internal/readline/utils:370:14)
+    at emitKeys.next (<anonymous>)
+    at ReadStream.onData (node:internal/readline/emitKeypressEvents:64:36)
+[error] 
+[error] Error: An unexpected error has occurred.
